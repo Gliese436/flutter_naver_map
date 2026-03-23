@@ -135,6 +135,7 @@ class _NaverMapState extends State<NaverMap>
             legacyMapInitializer._androidSdkVersion,
         forceHybridComposition: widget.forceHybridComposition,
         forceGLSurfaceView: widget.forceGLSurfaceView,
+        onWebMapCreated: kIsWeb ? _onWebMapCreated : null,
       )),
       Positioned.fill(child: _uiLayer(widget.options)),
     ]);
@@ -236,6 +237,20 @@ class _NaverMapState extends State<NaverMap>
     controller = NaverMapController._createController(channel,
         viewId: id,
         initialCameraPosition: widget.options.initialCameraPosition);
+  }
+
+  void _onWebMapCreated(int id, dynamic jsMap) {
+    controller = NaverMapController._createWebController(
+        viewId: id,
+        jsMap: jsMap,
+        initialCameraPosition: widget.options.initialCameraPosition,
+        onMapTapped: (point, latLng) => onMapTapped(point, latLng),
+        onCameraChange: (reason, animated, position) =>
+            onCameraChangeWithCameraPosition(reason, animated, position),
+        onCameraIdle: (position) => onCameraIdle(position),
+    );
+    // 웹에서는 MethodChannel이 없으므로 바로 onMapReady 호출
+    onMapReady();
   }
 
   Set<Factory<OneSequenceGestureRecognizer>> _createGestureRecognizers(

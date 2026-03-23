@@ -5,16 +5,19 @@ homepage: https://github.com/note11g/flutter_naver_map
 documentation: https://note11.dev/flutter_naver_map
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: '>=3.3.0 <4.0.0'
   flutter: ">=3.22.0"
 
 dependencies:
   flutter:
     sdk: flutter
+  flutter_web_plugins:
+    sdk: flutter
   vector_math: ^2.1.4
   path_provider: ^2.1.4
   crypto: ^3.0.5
   meta: ^1.12.0 # for flutter 3.22.0
+  web: ^1.0.0
 
 dev_dependencies:
   flutter_test:
@@ -29,6 +32,9 @@ flutter:
         pluginClass: FlutterNaverMapPlugin
       ios:
         pluginClass: SwiftFlutterNaverMapPlugin
+      web:
+        pluginClass: FlutterNaverMapWebPlugin
+        fileName: src/web/flutter_naver_map_web.dart
 
   assets:
     - ./assets/icon/location_overlay_icon.png

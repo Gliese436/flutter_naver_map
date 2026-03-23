@@ -13,8 +13,14 @@ class _PlatformViewCreator {
     required int? androidSdkVersion,
     bool? forceHybridComposition,
     bool? forceGLSurfaceView,
+    void Function(int id, dynamic jsMap)? onWebMapCreated,
   }) {
-    if (Platform.isAndroid) {
+    if (kIsWeb) {
+      return _WebMapViewWrapper(
+        creationParams: creationParams.map,
+        onWebMapCreated: onWebMapCreated!,
+      );
+    } else if (isAndroid) {
       return PlatformViewLink(
         viewType: viewType,
         surfaceFactory: (context, controller) => AndroidViewSurface(
@@ -54,7 +60,7 @@ class _PlatformViewCreator {
           return view..create();
         },
       );
-    } else if (Platform.isIOS) {
+    } else if (isIOS) {
       return UiKitView(
         viewType: viewType,
         layoutDirection: layoutDirection,
@@ -67,5 +73,30 @@ class _PlatformViewCreator {
     } else {
       throw PlatformException(code: "unsupportedPlatform");
     }
+  }
+}
+
+/// 웹 맵 뷰를 감싸는 StatefulWidget입니다.
+/// conditional import를 통해 web_view 모듈을 사용합니다.
+class _WebMapViewWrapper extends StatefulWidget {
+  final Map<String, dynamic> creationParams;
+  final void Function(int id, dynamic jsMap) onWebMapCreated;
+
+  const _WebMapViewWrapper({
+    required this.creationParams,
+    required this.onWebMapCreated,
+  });
+
+  @override
+  State<_WebMapViewWrapper> createState() => _WebMapViewWrapperState();
+}
+
+class _WebMapViewWrapperState extends State<_WebMapViewWrapper> {
+  @override
+  Widget build(BuildContext context) {
+    return web_view.createWebNaverMapView(
+      creationParams: widget.creationParams,
+      onMapCreated: widget.onWebMapCreated,
+    );
   }
 }

@@ -4,7 +4,15 @@ library flutter_naver_map;
 
 import "dart:async";
 import 'dart:developer' show log;
-import 'dart:io' show File, Platform;
+import "src/platform/platform_stub.dart"
+    if (dart.library.io) "src/platform/platform_io.dart"
+    if (dart.library.js_interop) "src/platform/platform_web.dart";
+import "src/web/web_view_creator_stub.dart"
+    if (dart.library.js_interop) "src/web/web_view_creator.dart"
+    as web_view;
+import "src/web/web_map_operations_stub.dart"
+    if (dart.library.js_interop) "src/web/web_map_operations.dart"
+    as web_ops;
 import 'dart:math' as math show Point, min, max, pi;
 
 import 'package:flutter/foundation.dart';
@@ -15,7 +23,8 @@ import 'package:flutter/services.dart';
 import "package:flutter_naver_map/src/initializer/flutter_naver_map_initializer.dart";
 import 'package:flutter_naver_map/src/messaging/messaging.dart';
 import "package:flutter_naver_map/src/util/custom_data_stream.dart";
-import 'package:flutter_naver_map/src/util/image_util.dart';
+import "package:flutter_naver_map/src/util/image_util.dart"
+    if (dart.library.js_interop) "package:flutter_naver_map/src/util/image_util_web.dart";
 import "package:flutter_naver_map/src/util/app_lifecycle_binder.dart";
 import "package:flutter_naver_map/src/util/location/builtin/default_my_location_tracker.dart";
 import 'package:flutter_naver_map/src/util/math.dart';

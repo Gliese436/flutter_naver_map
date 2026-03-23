@@ -1,10 +1,15 @@
 import "dart:developer";
-import "dart:io";
 
+import "package:flutter/foundation.dart" show kIsWeb;
 import "package:flutter/services.dart";
 import "package:flutter_naver_map/flutter_naver_map.dart";
 import "package:flutter_naver_map/src/messaging/messaging.dart";
 import "package:meta/meta.dart";
+
+import "package:flutter_naver_map/src/platform/platform_stub.dart"
+    if (dart.library.io) "package:flutter_naver_map/src/platform/platform_io.dart"
+    if (dart.library.js_interop) "package:flutter_naver_map/src/platform/platform_web.dart"
+    as platform_info;
 
 class FlutterNaverMap {
   @internal
@@ -31,6 +36,14 @@ class FlutterNaverMap {
     String? clientId,
     Function(NAuthFailedException ex)? onAuthFailed,
   }) async {
+    if (kIsWeb) {
+      // 웹에서는 index.html의 script 태그로 JS SDK가 로딩됨.
+      // MethodChannel은 사용하지 않음.
+      isInitialized = true;
+      log("SDK Initialized! (web)", name: "FlutterNaverMap");
+      return;
+    }
+
     if (!isInitialized) {
       NChannel.sdkChannel.setMethodCallHandler(_handler);
     }
@@ -43,12 +56,13 @@ class FlutterNaverMap {
     if (result != null) androidSdkVersion = result["androidSdkVersion"];
     isInitialized = true;
 
-    log("SDK Initialized! (${Platform.operatingSystem}${Platform.isAndroid ? ", SDK $androidSdkVersion" : ""})",
+    log("SDK Initialized! (${platform_info.operatingSystemName}${platform_info.isAndroid ? ", SDK $androidSdkVersion" : ""})",
         name: "FlutterNaverMap");
   }
 
   @internal
   Future<String?> getNativeMapSdkVersion() async {
+    if (kIsWeb) return null;
     final version = await NChannel.sdkChannel.invokeMethod<String>(
         "getNativeMapSdkVersion");
     return version;

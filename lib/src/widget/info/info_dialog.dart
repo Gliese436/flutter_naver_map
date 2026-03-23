@@ -1,6 +1,6 @@
 import "dart:convert" show jsonDecode;
-import "dart:io";
 
+import "package:flutter/foundation.dart" show kIsWeb, defaultTargetPlatform, TargetPlatform;
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 import "package:flutter_naver_map/flutter_naver_map.dart";
@@ -22,13 +22,19 @@ class _NMapInfoDialogState extends State<NMapInfoDialog> {
 
   static final ValueNotifier<String?> _naverMapVersion = ValueNotifier(null);
 
+  static bool get _isIOSPlatform =>
+      !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
+
+  static bool get _isAndroidPlatform =>
+      !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
+
   @override
   void initState() {
     super.initState();
     _getVersionInfo().then((version) {
       if (version != null) {
         _version.value = version.packageVersion;
-        _dependencies.value = Platform.isIOS
+        _dependencies.value = _isIOSPlatform
             ? version.nativeVersion.iosDependencies
             : version.nativeVersion.androidDependencies;
       }
@@ -57,6 +63,10 @@ class _NMapInfoDialogState extends State<NMapInfoDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final sdkLabel = kIsWeb
+        ? "Naver Map Web SDK"
+        : "Naver Map ${_isIOSPlatform ? "iOS" : "Android"} SDK";
+
     return Dialog(
         backgroundColor: switch (Theme.of(context).brightness) {
           Brightness.dark => Colors.grey.shade900,
@@ -85,8 +95,7 @@ class _NMapInfoDialogState extends State<NMapInfoDialog> {
                       valueListenable: _naverMapVersion,
                       builder: (context, version, child) {
                         return _versionInfo(
-                            title:
-                                "Naver Map ${Platform.isIOS ? "iOS" : "Android"} SDK",
+                            title: sdkLabel,
                             version: version ?? "Unknown",
                             description:
                                 "Copyright © 2018-$currentYear NAVER Corp.\nAll rights reserved.");
@@ -108,14 +117,14 @@ class _NMapInfoDialogState extends State<NMapInfoDialog> {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                       // todo: showLegend is not support on iOS Platform currently.
-                      if (Platform.isAndroid)
+                      if (_isAndroidPlatform)
                         Expanded(
                             child: _buttons(
                                 title: "범례",
                                 engTitle: "Legend",
                                 onTap: () =>
                                     widget.naverMapController?.openLegend())),
-                      if (Platform.isAndroid)
+                      if (_isAndroidPlatform)
                         Container(
                           width: 1,
                           color: _dividerColor,
@@ -184,7 +193,7 @@ class _NMapInfoDialogState extends State<NMapInfoDialog> {
               style: TextStyle(
                   fontSize: 13,
                   fontWeight:
-                      Platform.isIOS ? FontWeight.w600 : FontWeight.w500,
+                      _isIOSPlatform ? FontWeight.w600 : FontWeight.w500,
                   letterSpacing: 13 * -0.02)),
           const SizedBox(height: 2),
           Text(engTitle,
