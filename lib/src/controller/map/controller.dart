@@ -298,6 +298,7 @@ class _NaverMapControllerWebImpl implements NaverMapController {
   final int viewId;
   final dynamic _jsMap;
   final Map<NOverlayInfo, dynamic> _jsOverlays = {};
+  late final _NOverlayControllerWebImpl _webOverlayController;
 
   final NValueHoldHotStreamController<OnCameraChangedParams>
       _nowCameraPositionStreamController;
@@ -345,6 +346,10 @@ class _NaverMapControllerWebImpl implements NaverMapController {
         _updateNowCameraPositionData(position, null, true);
         onCameraIdle(position);
       },
+    );
+    _webOverlayController = _NOverlayControllerWebImpl(
+      viewId: viewId,
+      jsOverlayRefs: _jsOverlays,
     );
   }
 
@@ -516,6 +521,9 @@ class _NaverMapControllerWebImpl implements NaverMapController {
       final jsOverlay = _createJsOverlay(overlay);
       if (jsOverlay != null) {
         _jsOverlays[overlay.info] = jsOverlay;
+
+        // 오버레이를 웹 컨트롤러에 연결 (_isAdded = true)
+        overlay._addedOnMap(_webOverlayController);
 
         // 웹에서는 항상 JS 클릭 리스너를 등록합니다.
         // setOnTapListener가 addOverlay 이후에 호출될 수 있으므로,
@@ -699,6 +707,7 @@ class _NaverMapControllerWebImpl implements NaverMapController {
     if (jsOverlay != null) {
       web_ops.webRemoveOverlay(jsOverlay);
     }
+    _webOverlayController.deleteWithInfo(info);
   }
 
   @override
@@ -714,6 +723,7 @@ class _NaverMapControllerWebImpl implements NaverMapController {
     for (final key in keysToRemove) {
       _jsOverlays.remove(key);
     }
+    _webOverlayController.clear(type);
   }
 
   @override
@@ -796,5 +806,91 @@ class _NaverMapControllerWebImpl implements NaverMapController {
     _nowCameraPositionStreamController.close();
     _trackingModeStreamController.close();
     clearOverlays();
+    _webOverlayController.clear(null);
+  }
+}
+
+/// 웹 플랫폼용 오버레이 컨트롤러.
+/// MethodChannel 없이 JS 오버레이 속성 변경을 처리합니다.
+class _NOverlayControllerWebImpl extends _NOverlayController {
+  @override
+  final int viewId;
+
+  @override
+  late final MethodChannel channel;
+
+  final Map<NOverlayInfo, dynamic> _jsOverlayRefs;
+  final Map<NOverlayInfo, NOverlay> _overlays = {};
+
+  _NOverlayControllerWebImpl({
+    required this.viewId,
+    required Map<NOverlayInfo, dynamic> jsOverlayRefs,
+  }) : _jsOverlayRefs = jsOverlayRefs {
+    // MethodChannel 없이 isChannelInitialized을 true로 설정
+    isChannelInitialized = true;
+  }
+
+  @override
+  void add(NOverlayInfo info, NOverlay overlay) {
+    _overlays[info] = overlay;
+  }
+
+  @override
+  void deleteWithInfo(NOverlayInfo info) {
+    _overlays.remove(info);
+  }
+
+  @override
+  void clear(NOverlayType? type) {
+    if (type != null) {
+      _overlays.removeWhere((info, _) => info.type == type);
+    } else {
+      _overlays.clear();
+    }
+  }
+
+  @override
+  Future<T?> invokeMethod<T>(String funcName, [NMessageable? arg]) async {
+    // funcName 형식: "#TYPE#id#methodName"
+    // 웹에서는 속성 변경 요청을 JS 오버레이에 반영합니다.
+    final query = _NOverlayQuery.fromQuery(funcName);
+    final jsOverlay = _jsOverlayRefs[query.info];
+    if (jsOverlay == null) return null;
+
+    final methodName = query.methodName;
+    final value = arg?.payload;
+
+    switch (methodName) {
+      case "isVisible":
+        if (value is bool) web_ops.webSetOverlayVisible(jsOverlay, value);
+        break;
+      case "zIndex" || "globalZIndex":
+        if (value is int) web_ops.webSetOverlayZIndex(jsOverlay, value);
+        if (value is double) web_ops.webSetOverlayZIndex(jsOverlay, value.toInt());
+        break;
+      case "position":
+        if (value is Map) {
+          web_ops.webSetMarkerPosition(jsOverlay,
+              (value["lat"] as num).toDouble(), (value["lng"] as num).toDouble());
+        }
+        break;
+      case "icon":
+        if (value is Map) {
+          final iconUrl = value["path"] as String?;
+          final srcW = (value["sourceWidth"] as num?)?.toDouble();
+          final srcH = (value["sourceHeight"] as num?)?.toDouble();
+          web_ops.webSetMarkerIcon(jsOverlay, iconUrl, srcW, srcH);
+        }
+        break;
+      case "hasOnTapListener":
+        // 클릭 리스너는 addOverlayAll에서 이미 등록됨 - 무시
+        break;
+      case "performClick":
+        final overlay = _overlays[query.info];
+        if (overlay != null) overlay._handle("onTap");
+        break;
+    }
+
+    return null;
   }
 }
