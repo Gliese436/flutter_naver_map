@@ -518,16 +518,16 @@ class _NaverMapControllerWebImpl implements NaverMapController {
   @override
   Future<void> addOverlayAll(Set<NAddableOverlay> overlays) async {
     for (final overlay in overlays) {
+      // JS Marker 생성자 내부에서 SDK 이벤트가 발생하여
+      // Dart 콜백이 호출될 수 있으므로, _addedOnMap을 먼저 호출하여
+      // _isAdded = true 상태를 보장합니다.
+      overlay._addedOnMap(_webOverlayController);
+
       final jsOverlay = _createJsOverlay(overlay);
       if (jsOverlay != null) {
         _jsOverlays[overlay.info] = jsOverlay;
 
-        // 오버레이를 웹 컨트롤러에 연결 (_isAdded = true)
-        overlay._addedOnMap(_webOverlayController);
-
         // 웹에서는 항상 JS 클릭 리스너를 등록합니다.
-        // setOnTapListener가 addOverlay 이후에 호출될 수 있으므로,
-        // 콜백에서 _handle을 호출하여 현재 등록된 리스너를 실행합니다.
         web_ops.webSetOverlayClickListener(jsOverlay, () {
           overlay._handle("onTap");
         });

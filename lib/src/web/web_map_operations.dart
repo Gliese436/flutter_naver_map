@@ -172,12 +172,13 @@ dynamic webAddMarker(dynamic jsMap, {
   bool clickable = false,
 }) {
   final map = jsMap as JSNaverMap;
+  // map 옵션 없이 생성하여 생성자 내부 이벤트를 방지합니다.
+  // setMap은 addOverlayAll에서 _addedOnMap 이후에 별도 호출됩니다.
   final options = JSMarkerOptions(
     position: createLatLng(lat, lng),
-    map: map,
     visible: visible.toJS,
     zIndex: zIndex.toDouble().toJS,
-    clickable: clickable.toJS,
+    clickable: true.toJS,
   );
 
   if (iconUrl != null) {
@@ -196,7 +197,9 @@ dynamic webAddMarker(dynamic jsMap, {
     (options as JSObject).setProperty("icon".toJS, icon);
   }
 
-  return JSMarker(options);
+  final marker = JSMarker(options);
+  marker.setMap(map);
+  return marker;
 }
 
 dynamic webAddPolyline(dynamic jsMap, {
@@ -214,8 +217,7 @@ dynamic webAddPolyline(dynamic jsMap, {
       .toList()
       .toJS;
 
-  return JSPolyline(JSPolylineOptions(
-    map: map,
+  final polyline = JSPolyline(JSPolylineOptions(
     path: path,
     strokeColor: colorToHexString(color).toJS,
     strokeOpacity: colorToOpacity(color).toJS,
@@ -224,6 +226,8 @@ dynamic webAddPolyline(dynamic jsMap, {
     zIndex: zIndex.toDouble().toJS,
     clickable: clickable.toJS,
   ));
+  polyline.setMap(map);
+  return polyline;
 }
 
 dynamic webAddPolygon(dynamic jsMap, {
@@ -241,8 +245,7 @@ dynamic webAddPolygon(dynamic jsMap, {
     coords.map((c) => createLatLng(c[0], c[1])).toList().toJS
   ].toJS;
 
-  return JSPolygon(JSPolygonOptions(
-    map: map,
+  final polygon = JSPolygon(JSPolygonOptions(
     paths: paths,
     fillColor: colorToHexString(color).toJS,
     fillOpacity: colorToOpacity(color).toJS,
@@ -253,6 +256,8 @@ dynamic webAddPolygon(dynamic jsMap, {
     zIndex: zIndex.toDouble().toJS,
     clickable: clickable.toJS,
   ));
+  polygon.setMap(map);
+  return polygon;
 }
 
 dynamic webAddCircle(dynamic jsMap, {
@@ -268,8 +273,7 @@ dynamic webAddCircle(dynamic jsMap, {
   bool clickable = false,
 }) {
   final map = jsMap as JSNaverMap;
-  return JSCircle(JSCircleOptions(
-    map: map,
+  final circle = JSCircle(JSCircleOptions(
     center: createLatLng(lat, lng),
     radius: radius.toJS,
     fillColor: colorToHexString(color).toJS,
@@ -281,6 +285,8 @@ dynamic webAddCircle(dynamic jsMap, {
     zIndex: zIndex.toDouble().toJS,
     clickable: clickable.toJS,
   ));
+  circle.setMap(map);
+  return circle;
 }
 
 dynamic webAddInfoWindow(dynamic jsMap, {
@@ -322,14 +328,15 @@ dynamic webAddGroundOverlay(dynamic jsMap, {
     createLatLng(swLat, swLng),
     createLatLng(neLat, neLng),
   );
-  return JSGroundOverlay(
+  final groundOverlay = JSGroundOverlay(
     imageUrl.toJS,
     bounds,
     JSGroundOverlayOptions(
-      map: map,
       opacity: alpha.toJS,
     ),
   );
+  groundOverlay.setMap(map);
+  return groundOverlay;
 }
 
 void webRemoveOverlay(dynamic jsOverlay) {
