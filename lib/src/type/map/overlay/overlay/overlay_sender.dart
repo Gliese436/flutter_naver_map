@@ -9,6 +9,7 @@ mixin _NOverlaySender {
 
   Future<dynamic> _send(String method, [dynamic arguments]) async {
     if (!_isAdded) {
+      if (kIsWeb) return null;
       throw NOverlayNotAddedOnMapException("Overlay Not added on Map!");
     }
 

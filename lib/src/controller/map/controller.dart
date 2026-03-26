@@ -546,27 +546,34 @@ class _NaverMapControllerWebImpl implements NaverMapController {
         double? width, height;
         if (iconData is Map) {
           iconUrl = iconData["path"] as String?;
+          // Size는 NMessageable이 아니므로 Dart Size 객체로 남아있음
           final sizeData = payload["size"];
-          if (sizeData is Map) {
+          if (sizeData is Size) {
+            width = sizeData.width;
+            height = sizeData.height;
+          } else if (sizeData is Map) {
             width = (sizeData["width"] as num?)?.toDouble();
             height = (sizeData["height"] as num?)?.toDouble();
-            if (width == 0 && height == 0) {
-              // autoSize: 아이콘의 sourceSize 사용
-              final srcW = (iconData["sourceWidth"] as num?)?.toDouble();
-              final srcH = (iconData["sourceHeight"] as num?)?.toDouble();
-              if (srcW != null && srcH != null && srcW > 0 && srcH > 0) {
-                width = srcW;
-                height = srcH;
-              } else {
-                width = null;
-                height = null;
-              }
+          }
+          if (width == 0 && height == 0) {
+            // autoSize: 아이콘의 sourceSize 사용
+            final srcW = (iconData["sourceWidth"] as num?)?.toDouble();
+            final srcH = (iconData["sourceHeight"] as num?)?.toDouble();
+            if (srcW != null && srcH != null && srcW > 0 && srcH > 0) {
+              width = srcW;
+              height = srcH;
+            } else {
+              width = null;
+              height = null;
             }
           }
         }
         final anchorData = payload["anchor"];
         double? anchorX, anchorY;
-        if (anchorData is Map) {
+        if (anchorData is NPoint) {
+          anchorX = anchorData.x;
+          anchorY = anchorData.y;
+        } else if (anchorData is Map) {
           anchorX = (anchorData["x"] as num?)?.toDouble();
           anchorY = (anchorData["y"] as num?)?.toDouble();
         }
