@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:developer' show log;
-import 'dart:io';
+import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 
@@ -9,7 +9,7 @@ import 'package:flutter_naver_map/flutter_naver_map.dart';
 @visibleForTesting
 Future<void> mainWithTest(String tag) async {
   print("---------------- NEW TEST : $tag ----------------");
-  print("*** running platform: ${Platform.operatingSystem} ***\n");
+  print("*** running platform: ${defaultTargetPlatform.name} ***\n");
 
   WidgetsFlutterBinding.ensureInitialized();
   await NaverMapSdk.instance.initialize(clientId: '', onAuthFailed: (ex) {});

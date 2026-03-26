@@ -7,8 +7,7 @@ class ExampleAppTheme {
       colorScheme: ColorScheme.light(
         primary: Colors.green,
         secondary: Colors.grey,
-        background: Colors.white,
-        onBackground: Colors.black,
+        surface: Colors.white,
         outline: Colors.grey.shade200,
         outlineVariant: Colors.grey.shade200,
         primaryContainer: const Color(0xFFD2FFB4),
@@ -51,8 +50,7 @@ class ExampleAppTheme {
       colorScheme: ColorScheme.dark(
         primary: Colors.green,
         secondary: Colors.grey.shade600,
-        background: Colors.grey.shade900,
-        onBackground: Colors.white,
+        surface: Colors.grey.shade900,
         outline: Colors.grey.shade700,
         outlineVariant: Colors.white54,
         primaryContainer: const Color(0xFF7FA864),

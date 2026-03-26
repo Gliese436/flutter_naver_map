@@ -333,44 +333,25 @@ dynamic webAddGroundOverlay(dynamic jsMap, {
 }
 
 void webRemoveOverlay(dynamic jsOverlay) {
-  if (jsOverlay is JSMarker) {
-    jsOverlay.setMap(null);
-  } else if (jsOverlay is JSPolyline) {
-    jsOverlay.setMap(null);
-  } else if (jsOverlay is JSPolygon) {
-    jsOverlay.setMap(null);
-  } else if (jsOverlay is JSCircle) {
-    jsOverlay.setMap(null);
-  } else if (jsOverlay is JSInfoWindow) {
-    jsOverlay.close();
-  } else if (jsOverlay is JSGroundOverlay) {
-    jsOverlay.setMap(null);
+  final obj = jsOverlay as JSObject;
+  if (obj.hasProperty("setMap".toJS).toDart) {
+    obj.callMethodVarArgs("setMap".toJS, <JSAny?>[null]);
+  } else if (obj.hasProperty("close".toJS).toDart) {
+    obj.callMethodVarArgs("close".toJS, <JSAny?>[]);
   }
 }
 
 void webSetOverlayVisible(dynamic jsOverlay, bool visible) {
-  if (jsOverlay is JSMarker) {
-    jsOverlay.setVisible(visible.toJS);
-  } else if (jsOverlay is JSPolyline) {
-    jsOverlay.setVisible(visible.toJS);
-  } else if (jsOverlay is JSPolygon) {
-    jsOverlay.setVisible(visible.toJS);
-  } else if (jsOverlay is JSCircle) {
-    jsOverlay.setVisible(visible.toJS);
+  final obj = jsOverlay as JSObject;
+  if (obj.hasProperty("setVisible".toJS).toDart) {
+    obj.callMethodVarArgs("setVisible".toJS, <JSAny?>[visible.toJS]);
   }
 }
 
 void webSetOverlayZIndex(dynamic jsOverlay, int zIndex) {
-  if (jsOverlay is JSMarker) {
-    jsOverlay.setZIndex(zIndex.toDouble().toJS);
-  } else if (jsOverlay is JSPolyline) {
-    jsOverlay.setZIndex(zIndex.toDouble().toJS);
-  } else if (jsOverlay is JSPolygon) {
-    jsOverlay.setZIndex(zIndex.toDouble().toJS);
-  } else if (jsOverlay is JSCircle) {
-    jsOverlay.setZIndex(zIndex.toDouble().toJS);
-  } else if (jsOverlay is JSInfoWindow) {
-    jsOverlay.setZIndex(zIndex.toDouble().toJS);
+  final obj = jsOverlay as JSObject;
+  if (obj.hasProperty("setZIndex".toJS).toDart) {
+    obj.callMethodVarArgs("setZIndex".toJS, <JSAny?>[zIndex.toDouble().toJS]);
   }
 }
 

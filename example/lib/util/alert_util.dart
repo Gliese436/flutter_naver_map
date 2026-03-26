@@ -10,8 +10,8 @@ class AlertUtil {
     Color? toastColor,
     Color? textColor,
   }) {
-    toastColor ??= getColorTheme(context).onBackground;
-    textColor ??= getColorTheme(context).background;
+    toastColor ??= getColorTheme(context).onSurface;
+    textColor ??= getColorTheme(context).surface;
 
     showToast(
       title,

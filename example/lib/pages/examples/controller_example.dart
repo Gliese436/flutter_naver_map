@@ -1,7 +1,8 @@
 import 'dart:async';
-import 'dart:io';
-
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import '../../util/snapshot_image_stub.dart'
+    if (dart.library.io) '../../util/snapshot_image_io.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import '../../design/custom_widget.dart';
@@ -175,6 +176,12 @@ class _NaverMapControllerExampleState extends State<NaverMapControllerExample> {
   }
 
   void _takeSnapshot() async {
+    if (kIsWeb) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("웹에서는 지도 캡쳐를 지원하지 않습니다.")),
+      );
+      return;
+    }
     final snapshot = await _mapController.takeSnapshot(showControls: false);
     if (mounted) {
       showDialog(
@@ -182,7 +189,7 @@ class _NaverMapControllerExampleState extends State<NaverMapControllerExample> {
           builder: (context) {
             return Center(
                 child: Material(
-              color: getColorTheme(context).background,
+              color: getColorTheme(context).surface,
               borderRadius: BorderRadius.circular(12),
               child: Container(
                   padding: const EdgeInsets.all(12),
@@ -195,7 +202,7 @@ class _NaverMapControllerExampleState extends State<NaverMapControllerExample> {
                         Container(
                             margin: const EdgeInsets.only(top: 6),
                             height: MediaQuery.sizeOf(context).height * 0.64,
-                            child: Image.file(File(snapshot.path))),
+                            child: buildSnapshotImage(snapshot)),
                       ])),
             ));
           });

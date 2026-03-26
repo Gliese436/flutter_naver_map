@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(flutter pub:*)",
+      "Bash(dart doc:*)",
+      "Read(//Users/fdk/.pub-cache/hosted/pub.dev/**)"
+    ]
+  }
+}

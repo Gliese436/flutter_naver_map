@@ -1,5 +1,4 @@
-import 'dart:io';
-
+import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform, TargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
 
@@ -98,7 +97,7 @@ class EasyDropdown<T extends Enum> extends StatelessWidget
           borderRadius: BorderRadius.circular(8)),
       padding: const EdgeInsets.only(right: 8),
       child: DropdownButton(
-          dropdownColor: getColorTheme(context).background,
+          dropdownColor: getColorTheme(context).surface,
           underline: Container(),
           isExpanded: true,
           borderRadius: BorderRadius.circular(8),
@@ -175,7 +174,7 @@ class EasySlider extends StatelessWidget with EasySelectorWidget {
                       thumbShape:
                           const RoundSliderThumbShape(enabledThumbRadius: 10),
                       overlayShape: SliderComponentShape.noThumb,
-                      showValueIndicator: ShowValueIndicator.always),
+                      showValueIndicator: ShowValueIndicator.onDrag),
                   child: Slider(
                       min: min,
                       max: max,
@@ -621,7 +620,7 @@ class BaseDrawerHeader extends StatelessWidget {
             border: Border(
                 bottom: BorderSide(
                     color:
-                        getColorTheme(context).onBackground.withOpacity(0.28),
+                        getColorTheme(context).onSurface.withOpacity(0.28),
                     width: 0.2))),
         padding: padding,
         child: child);
@@ -636,14 +635,15 @@ class VersionInfoWidget extends StatelessWidget {
     return Container(
         padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
         decoration: BoxDecoration(
-            color: Platform.isAndroid ? Colors.green : Colors.black,
+            color: !kIsWeb && defaultTargetPlatform == TargetPlatform.android ? Colors.green : Colors.black,
             borderRadius: BorderRadius.circular(4)),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
-          Icon(Platform.isAndroid ? Icons.android : Icons.apple,
+          Icon(!kIsWeb && defaultTargetPlatform == TargetPlatform.android ? Icons.android
+              : kIsWeb ? Icons.web : Icons.apple,
               color: Colors.white, size: 14),
           const SizedBox(width: 2),
           Flexible(
-              child: Text(Platform.operatingSystemVersion,
+              child: Text(kIsWeb ? "Web" : defaultTargetPlatform.name,
                   softWrap: false,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

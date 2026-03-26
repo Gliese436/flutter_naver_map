@@ -220,7 +220,7 @@ class _FNMapPageState extends State<FNMapPage> {
       expandedHeight: MediaQuery.sizeOf(context).height / 2,
       handleSectionHeight: _drawerHandleHeight,
       handleColor: getColorTheme(context).secondary,
-      backgroundColor: getColorTheme(context).background,
+      backgroundColor: getColorTheme(context).surface,
       onReady: (controller) => drawerController = controller,
       onHeightChanged: (height) {
         initMainDrawerHeight ??= height;

@@ -62,7 +62,7 @@ class NInfoOverlayPortalController extends OverlayPortalController {
                         nipRadius: 4,
                         elevation: 6,
                         padding: EdgeInsets.zero,
-                        color: getColorTheme(context).background,
+                        color: getColorTheme(context).surface,
                         shadowColor: Colors.black,
                         nipPosition: BalloonNipPosition.topLeft,
                         child:

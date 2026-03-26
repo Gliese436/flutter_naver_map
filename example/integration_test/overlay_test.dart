@@ -103,7 +103,7 @@ void overlayTests() {
 
     await controller.addOverlayAll(overlaySet);
 
-    final locationOverlay = await controller.getLocationOverlay();
+    final locationOverlay = controller.getLocationOverlay();
 
     locationOverlay
       ..setPosition(nowPosition)

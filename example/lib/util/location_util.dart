@@ -1,5 +1,4 @@
-import 'dart:io';
-
+import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform, TargetPlatform;
 import 'package:permission_handler/permission_handler.dart';
 
 class ExampleLocationUtil {
@@ -16,7 +15,9 @@ class ExampleLocationUtil {
   }
 
   static Future<bool> requestAndGrantedCheck() async {
-    if (Platform.isAndroid) {
+    if (kIsWeb) return false;
+
+    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
       final enabled = await _hasPermission; // 권한이 있는지 확인합니다.
       if (enabled) return true; // 있다면, true를 반환합니다.
     }
