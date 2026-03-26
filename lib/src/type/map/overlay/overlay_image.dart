@@ -10,29 +10,34 @@ part of "../../../../flutter_naver_map.dart";
 class NOverlayImage with NMessageableWithMap {
   final String _path;
   final _NOverlayImageMode _mode;
+  final Size? _sourceSize;
 
   const NOverlayImage._({
     required String path,
     required _NOverlayImageMode mode,
+    Size? sourceSize,
   })  : _path = path,
-        _mode = mode;
+        _mode = mode,
+        _sourceSize = sourceSize;
 
   /// 이미지 에셋으로 지도에서 사용할 이미지를 생성합니다. (jpg, png supported)
   const NOverlayImage.fromAssetImage(String assetName)
       : _path = assetName,
-        _mode = _NOverlayImageMode.asset;
+        _mode = _NOverlayImageMode.asset,
+        _sourceSize = null;
 
   /// 이미지 파일으로 지도에서 사용할 이미지를 생성합니다. (jpg, png supported)
   NOverlayImage.fromFile(File file)
       : _path = file.path,
-        _mode = _NOverlayImageMode.file;
+        _mode = _NOverlayImageMode.file,
+        _sourceSize = null;
 
   /// ByteArray로 지도에서 사용할 이미지를 생성합니다. (캐시를 사용합니다)
   /// 
   /// 기본적으로 image byte를 통해 hash를 생성하여 cache key로 사용하나, 해시 충돌 가능성이 있으므로 [cacheKey] 사용을 권장합니다.
-  static Future<NOverlayImage> fromByteArray(Uint8List imageBytes, {String? cacheKey}) async {
+  static Future<NOverlayImage> fromByteArray(Uint8List imageBytes, {String? cacheKey, Size? sourceSize}) async {
     final path = await ImageUtil.saveImage(imageBytes, cacheKey);
-    return NOverlayImage._(path: path, mode: _NOverlayImageMode.temp);
+    return NOverlayImage._(path: path, mode: _NOverlayImageMode.temp, sourceSize: sourceSize);
   }
 
   /// 위젯을 지도의 이미지로 생성합니다. (캐시를 사용합니다)
@@ -57,13 +62,15 @@ class NOverlayImage with NMessageableWithMap {
     final imageBytes = await WidgetToImageUtil.widgetToImageByte(widget,
         size: size, context: context);
     final path = await ImageUtil.saveImage(imageBytes);
-    return NOverlayImage._(path: path, mode: _NOverlayImageMode.widget);
+    return NOverlayImage._(path: path, mode: _NOverlayImageMode.widget, sourceSize: size);
   }
 
   @override
   NPayload toNPayload() => NPayload.make({
         "path": _path,
         "mode": _mode,
+        if (_sourceSize != null) "sourceWidth": _sourceSize.width,
+        if (_sourceSize != null) "sourceHeight": _sourceSize.height,
       });
 
   @override

@@ -517,11 +517,12 @@ class _NaverMapControllerWebImpl implements NaverMapController {
       if (jsOverlay != null) {
         _jsOverlays[overlay.info] = jsOverlay;
 
-        if (overlay._hasOnTapListener) {
-          web_ops.webSetOverlayClickListener(jsOverlay, () {
-            overlay.performClick();
-          });
-        }
+        // 웹에서는 항상 JS 클릭 리스너를 등록합니다.
+        // setOnTapListener가 addOverlay 이후에 호출될 수 있으므로,
+        // 콜백에서 _handle을 호출하여 현재 등록된 리스너를 실행합니다.
+        web_ops.webSetOverlayClickListener(jsOverlay, () {
+          overlay._handle("onTap");
+        });
       }
     }
   }
@@ -542,8 +543,16 @@ class _NaverMapControllerWebImpl implements NaverMapController {
             width = (sizeData["width"] as num?)?.toDouble();
             height = (sizeData["height"] as num?)?.toDouble();
             if (width == 0 && height == 0) {
-              width = null;
-              height = null;
+              // autoSize: 아이콘의 sourceSize 사용
+              final srcW = (iconData["sourceWidth"] as num?)?.toDouble();
+              final srcH = (iconData["sourceHeight"] as num?)?.toDouble();
+              if (srcW != null && srcH != null && srcW > 0 && srcH > 0) {
+                width = srcW;
+                height = srcH;
+              } else {
+                width = null;
+                height = null;
+              }
             }
           }
         }
