@@ -3,7 +3,9 @@
     "allow": [
       "Bash(flutter pub:*)",
       "Bash(dart doc:*)",
-      "Read(//Users/fdk/.pub-cache/hosted/pub.dev/**)"
+      "Read(//Users/fdk/.pub-cache/hosted/pub.dev/**)",
+      "Bash(flutter analyze:*)",
+      "Bash(flutter build:*)"
     ]
   }
 }

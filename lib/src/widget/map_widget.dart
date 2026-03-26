@@ -240,6 +240,7 @@ class _NaverMapState extends State<NaverMap>
   }
 
   void _onWebMapCreated(int id, dynamic jsMap) {
+    debugPrint("[flutter_naver_map] _onWebMapCreated called (viewId: $id)");
     controller = NaverMapController._createWebController(
         viewId: id,
         jsMap: jsMap,
@@ -250,6 +251,7 @@ class _NaverMapState extends State<NaverMap>
         onCameraIdle: (position) => onCameraIdle(position),
     );
     // 웹에서는 MethodChannel이 없으므로 바로 onMapReady 호출
+    debugPrint("[flutter_naver_map] calling onMapReady from web");
     onMapReady();
   }
 

@@ -185,7 +185,7 @@ dynamic webAddMarker(dynamic jsMap, {
     if (width != null && height != null) {
       icon = JSImageIcon(
         url: iconUrl.toJS,
-        size: naverMaps.Size(width.toJS, height.toJS),
+        size: createSize(width, height),
         anchor: anchorX != null && anchorY != null
             ? createPoint(anchorX * width, anchorY * height)
             : null,
@@ -196,7 +196,7 @@ dynamic webAddMarker(dynamic jsMap, {
     (options as JSObject).setProperty("icon".toJS, icon);
   }
 
-  return naverMaps.Marker(options);
+  return JSMarker(options);
 }
 
 dynamic webAddPolyline(dynamic jsMap, {
@@ -214,7 +214,7 @@ dynamic webAddPolyline(dynamic jsMap, {
       .toList()
       .toJS;
 
-  return naverMaps.Polyline(JSPolylineOptions(
+  return JSPolyline(JSPolylineOptions(
     map: map,
     path: path,
     strokeColor: colorToHexString(color).toJS,
@@ -241,7 +241,7 @@ dynamic webAddPolygon(dynamic jsMap, {
     coords.map((c) => createLatLng(c[0], c[1])).toList().toJS
   ].toJS;
 
-  return naverMaps.Polygon(JSPolygonOptions(
+  return JSPolygon(JSPolygonOptions(
     map: map,
     paths: paths,
     fillColor: colorToHexString(color).toJS,
@@ -268,7 +268,7 @@ dynamic webAddCircle(dynamic jsMap, {
   bool clickable = false,
 }) {
   final map = jsMap as JSNaverMap;
-  return naverMaps.Circle(JSCircleOptions(
+  return JSCircle(JSCircleOptions(
     map: map,
     center: createLatLng(lat, lng),
     radius: radius.toJS,
@@ -292,7 +292,7 @@ dynamic webAddInfoWindow(dynamic jsMap, {
   int zIndex = 0,
 }) {
   final map = jsMap as JSNaverMap;
-  final infoWindow = naverMaps.InfoWindow(JSInfoWindowOptions(
+  final infoWindow = JSInfoWindow(JSInfoWindowOptions(
     content: content.toJS,
     zIndex: zIndex.toDouble().toJS,
   ));
@@ -322,7 +322,7 @@ dynamic webAddGroundOverlay(dynamic jsMap, {
     createLatLng(swLat, swLng),
     createLatLng(neLat, neLng),
   );
-  return naverMaps.GroundOverlay(
+  return JSGroundOverlay(
     imageUrl.toJS,
     bounds,
     JSGroundOverlayOptions(
@@ -365,7 +365,7 @@ void webSetMarkerIcon(dynamic jsMarker, String? iconUrl, double? width, double? 
   if (width != null && height != null) {
     marker.setIcon(JSImageIcon(
       url: iconUrl.toJS,
-      size: naverMaps.Size(width.toJS, height.toJS),
+      size: createSize(width, height),
     ) as JSAny);
   } else {
     marker.setIcon(iconUrl.toJS);
