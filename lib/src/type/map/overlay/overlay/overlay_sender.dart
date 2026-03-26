@@ -9,7 +9,9 @@ mixin _NOverlaySender {
 
   Future<dynamic> _send(String method, [dynamic arguments]) async {
     if (!_isAdded) {
-      if (kIsWeb) return null;
+      // 웹에서는 JS SDK 내부 이벤트로 인해 오버레이가 완전히 초기화되기 전에
+      // _send가 호출될 수 있으므로 예외를 throw하지 않습니다.
+      if (!isAndroid && !isIOS) return null;
       throw NOverlayNotAddedOnMapException("Overlay Not added on Map!");
     }
 
