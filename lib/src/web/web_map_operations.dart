@@ -186,7 +186,7 @@ dynamic webAddMarker(dynamic jsMap, {
     if (width != null && height != null) {
       icon = JSImageIcon(
         url: iconUrl.toJS,
-        size: createSize(width, height),
+        scaledSize: createSize(width, height),
         anchor: anchorX != null && anchorY != null
             ? createPoint(anchorX * width, anchorY * height)
             : null,
@@ -372,7 +372,7 @@ void webSetMarkerIcon(dynamic jsMarker, String? iconUrl, double? width, double? 
   if (width != null && height != null) {
     marker.setIcon(JSImageIcon(
       url: iconUrl.toJS,
-      size: createSize(width, height),
+      scaledSize: createSize(width, height),
     ) as JSAny);
   } else {
     marker.setIcon(iconUrl.toJS);
